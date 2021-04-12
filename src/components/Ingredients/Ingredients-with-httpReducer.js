@@ -34,7 +34,8 @@ const httpReducer = (curHttpState, action) => {
 };
 
 const Ingredients = () => {
-    // [] is the starting state of the userIngredients array, dispatch is the ingredientReducer function
+    // [] is the starting state of the userIngredients array, 
+    // dispatch is the function we call to "dispatch" the action that is handled by the ingredientReducer function
     const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
 
     const [httpState, dispatchHttp] = useReducer(httpReducer, {
@@ -56,6 +57,7 @@ const Ingredients = () => {
         dispatch({ type: 'SET', ingredients: filteredIngredients });
     }, []); // empty useCallback dependency array
 
+    // useCallback so that the unchanged function is not generated every time the component re-renders
     const addIngredientHandler = useCallback((ingredient) => {
         dispatchHttp({ type: 'SEND' });
         fetch(
@@ -78,6 +80,7 @@ const Ingredients = () => {
             });
     }, []);
 
+    // useCallback so that the unchanged function is not generated every time the component re-renders
     const removeIngredientHandler = useCallback((ingredientId) => {
         //setIsLoading(true);
         dispatchHttp({ type: 'SEND' });
@@ -103,7 +106,8 @@ const Ingredients = () => {
             });
     }, []);
 
-    const clearError = useCallback(() => {
+  // useCallback to ensure that the ErrorModal is not re-rendered unnecessarily
+  const clearError = useCallback(() => {
         dispatchHttp({ type: 'CLEAR' });
         //setError(null);
     }, []);

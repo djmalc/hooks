@@ -6,6 +6,7 @@ import ErrorModal from '../UI/ErrorModal';
 import Search from './Search';
 import useHttp from '../../hooks/http';
 
+// React will re-render the component whenever the reducer returns the new state
 const ingredientReducer = (currentIngredients, action) => {
     switch (action.type) {
         case 'SET':
@@ -20,7 +21,8 @@ const ingredientReducer = (currentIngredients, action) => {
 };
 
 const Ingredients = () => {
-    // [] is the starting state of the userIngredients array, dispatch is the ingredientReducer function
+    // [] is the starting state of the userIngredients array, 
+    // dispatch is the function we call to "dispatch" the action that is handled by the ingredientReducer function
     const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
     const { isLoading, error, data, sendRequest, reqExtra, reqIdentifier, clear } = useHttp();
 
@@ -38,13 +40,14 @@ const Ingredients = () => {
         }
     }, [data, reqExtra, reqIdentifier, isLoading, error]);
 
-    // useCallback "caches" the filteredIngredientsHandler function to stop re-rendering in Search.js
+    // useCallback "caches" filteredIngredientsHandler to stop re-rendering caused by changes to loadedIngredients in Search.js
     // changes to onLoadIngredients which cause Ingredients to re-render do not recreate the filteredIngredientsHandler function
     const filteredIngredientsHandler = useCallback((filteredIngredients) => {
         //setUserIngredients(filteredIngredients);
         dispatch({ type: 'SET', ingredients: filteredIngredients });
     }, []); // empty useCallback dependency array
 
+    // useCallback so that the unchanged addIngredientHandler function is not re-generated every time the component re-renders
     const addIngredientHandler = useCallback((ingredient) => {
         sendRequest(
             'https://react-hooks-update-e681b-default-rtdb.firebaseio.com/ingredients.json',
@@ -55,6 +58,7 @@ const Ingredients = () => {
         );
     }, [sendRequest]);
 
+    // useCallback so that the unchanged removeIngredientHandler function is not re-generated every time the component re-renders
     const removeIngredientHandler = useCallback(
         (ingredientId) => {
             sendRequest(
@@ -68,6 +72,8 @@ const Ingredients = () => {
         [sendRequest]
     );
 
+    // useMemo is used to "memorize" values so that they are not unnecessarily re-created each time the component re-renders
+    // dependency array specifies when they need to be "re-memorized" - so if userIngredients or removeIngredientsHandler changes
     const ingredientList = useMemo(() => {
         return (
             <IngredientList
